@@ -1,5 +1,7 @@
-%ifndef BASEDATA_1_0
-%define BASEDATA_1_0
+; A bunch of global definitions that are used by system functions and other things  
+
+%ifndef SYSDEF
+%define SYSDEF
 section .data
     NL equ 10
     NULL equ 0
@@ -22,4 +24,12 @@ section .data
     SYS_exit equ 60
     SYS_creat equ 85
     SYS_time equ 201
+
+    PROT_NONE equ 0x0
+    PROT_READ equ 0x1
+    PROT_WRITE equ 0x2
+    PROT_EXECUTE equ 0x4
+    MAP_PRIVATE equ 0x2
+    MAP_ANONYMOUS equ 0x20
+    MAP_FAILED equ -1
 %endif
