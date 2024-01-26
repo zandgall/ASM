@@ -6,9 +6,10 @@
 section .data
     content_len equ 16
     half_len equ 8
-    original_msg db "You entered: ",NULL
-    copied_msg db "We copied: ",NULL
-    half_msg db "Copied half: ",NULL
+    original_msg db "You entered: '",NULL
+    copied_msg db "We copied: '",NULL
+    half_msg db "Copied half: '",NULL
+    end_qt db "'",NULL
 
 section .bss
     original resb content_len
@@ -26,6 +27,10 @@ _start:
     call print
     mov rdi, original
     call print
+    mov rdi, end_qt
+    call print
+    call println
+
     
     mov rdi, original
     mov rsi, content_len
@@ -38,3 +43,25 @@ _start:
     mov rdx, half
     mov r10, content_len
     call memcpy
+
+    mov rdi, copied_msg
+    call print
+    mov rdi, copied
+    mov rsi, content_len
+    call printn
+    mov rdi, end_qt
+    call print
+    call println
+
+    mov rdi, half_msg
+    call print
+    mov rdi, half
+    mov rsi, content_len
+    call printn
+    mov rdi, end_qt
+    call print
+    call println
+
+    mov rax, SYS_exit
+    mov rdi, 0
+    syscall
