@@ -3,30 +3,37 @@
 ; stack_new(rdi: element_size) => rax: pointer to stack (NOTICE: NOT POINTER TO WHAT'S CONTAINED IN THE STACK, BUT TO THE STACK CLASS DEFINED ABOVE)
 ; stack_get(rax: *stack, rdi: index) => rax: pointer to element in stack with given index
 ; stack_push(rax: *stack, rdi: *element)
+; stack_pop(rax: *stack) => rax, if element_size <= 8, contains the value of the element popped
+
+; TODO BOARD ;
+; - Implement error checking
+; - Max stack allocation increase/decrease
+
 %ifndef STACK
 %define STACK
 %include "mem.1.0.s"
 
 section .text
 stack_new:
+	push r12
 	push rdi				; save 'element_size'
 	call malloc				; allocate one element's size
-	mov r11, rax			; save the location in r11
+	mov r12, rax			; save the location in r12
 
 	mov rdi, 32				; allocate 32 bytes, the size of the stack class structure (see top of file)
 	call malloc
 
 
 	pop rdi					; restore 'element_size'
-	mov qword[rax], r11		; set the first 8 bytes to the address of the currently 1-element allocated stack
+	mov qword[rax], r12		; set the first 8 bytes to the address of the currently 1-element allocated stack
 	add rax, 8				; move to the next 8 byte element (*end)
-	mov qword[rax], r11		; set the next 8 bytes to the address of the currently 1-element allocated stack,
-	add qword[rax], rdi		; and increment it to point to the end of the stack
+	mov qword[rax], r12		; set the next 8 bytes to the address of the currently 1-element allocated stack, (0 elements actually added)
 	add rax, 8				; move to the next 8 byte element (available)
 	mov qword[rax], 1		; set it to 1 element available
 	add rax, 8				; mov to the next 8 byte element (element_size)
 	mov qword[rax], rdi		; set it to element_size
 	sub rax, 24				; point rax back to the beginning of the class, and return
+	pop r12
 	ret
 
 stack_get:
@@ -53,6 +60,9 @@ stack_get_error:
 	sub rax, 24				; just point back to original
 	ret
 
+;~~~~~~~~~~~~~~~~~~~;
+;	STACK	PUSH	;
+;~~~~~~~~~~~~~~~~~~~;
 stack_push:
 	push r12
 	push r13
@@ -98,7 +108,8 @@ stack_push:
 	mov qword [rbx], rax	; *start = new space
 	add rbx, 8				; rbx->end
 	mov qword [rbx], rax	; *end = new space
-	add qword [rdx], r13	; *end += size of stack (in bytes)
+	add qword [rbx], r13	; *end += size of stack (in bytes)
+	mov r12, qword [rbx]	; r12 = *end
 	add rbx, 8
 	shl qword [rbx], 1		; double available
 	add rbx, 8				; rbx -24 + 8 + 8 + 8 Makes rbx unchanged
@@ -107,12 +118,12 @@ stack_push:
 	call munalloc			; unallocate previous stack space
 
 	mov rax, rbx
-	pop rdi
 	pop rbx
+	pop rdi
 
 stack_push_skip_grow:		;
 
-	;r12=*end, rdi = *element
+	;r12=*end, rdi = *element, r15 = element_size
 	mov rsi, r15
 	mov rdx, r12
 	mov r10, r15
@@ -135,4 +146,51 @@ stack_push_error:
 	pop r12
 	ret
 
+;~~~~~~~~~~~~~~~~~;
+;   STACK   POP   ;
+;~~~~~~~~~~~~~~~~~;
+stack_pop:
+	push r12
+	push r13
+	push r14
+	push r15
+	mov r12, qword[rax]		; r12 = *start
+	add rax, 8
+	mov r13, qword[rax]		; r13 = *end
+	cmp r12, r13
+	je stack_pop_ret		; If the end and the start are the same, (size==0) return
+	sub r13, r12			; r13 = size of stack (in bytes)
+	mov r12, qword[rax]		; r12 = *end
+	add rax, 8
+	mov r14, qword[rax]		; r14 = available (in elements)
+	add rax, 8
+	cmp r14, 1				; If the available num of elements is just 1, skip shrink (see next jmp inst)
+	mov r15, qword[rax]		; r15 = element_size
+	push rax
+	mov rax, r14
+	mul r15					; rax = available (in bytes)
+	mov r14, rax			; r14 = available (in bytes)
+	pop rax
+	je stack_pop_skip_shrink; see previous cmp inst
+	mov r8, r13
+	shl r8, 2
+	cmp r8, r14				; compare size of stack / 4 to available
+	ja stack_pop_skip_shrink; if size of stack is 2 factors smaller than available, shrink stack
+
+stack_pop_skip_shrink:
+	; r12 = end, r15 = element_size, rax -> element_size
+	sub rax, 16 			; rax -> end
+	cmp r15, 8
+	mov r12, rax			; r12 -> end
+	ja stack_pop_no_ret_val ; if element_size > 8, don't return a value
+	mov rax, qword[rax]
+stack_pop_no_ret_val:
+	sub qword[r12], r15
+stack_pop_ret:
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	ret
+	
 %endif
