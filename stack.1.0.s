@@ -183,7 +183,7 @@ stack_pop_skip_shrink:
 	cmp r15, 8
 	mov r12, rax			; r12 -> end
 	ja stack_pop_no_ret_val ; if element_size > 8, don't return a value
-	mov rax, qword[rax]
+	; mov rax, qword[rax]
 stack_pop_no_ret_val:
 	sub qword[r12], r15
 stack_pop_ret:

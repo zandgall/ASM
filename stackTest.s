@@ -60,6 +60,24 @@ print_stack_loop:
 	call printn
 	call println
 
+	mov rdi, quote
+	mov rsi, 1
+	call printn
+pop_stack_loop:
+	dec rbx
+	mov rax, qword [stack1]
+	mov rdi, rbx
+	call stack_get
+	mov rdi, rax
+	mov rsi, 1
+	call printn
+
+	mov rax, qword [stack1]
+	call stack_pop
+
+	cmp rbx, 0
+	jne print_stack_loop
+
 	mov rax, SYS_exit
 	mov rdi, 0
 	syscall
