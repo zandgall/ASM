@@ -7,7 +7,8 @@
 ;	~ Prints just a newline (\n) character
 ; printc(rdi: char)
 ;	~ Prints a single char
-; 
+; printi(rdi: int)
+;	~ Prints a decimal integer
 
 %ifndef PRINT
 %define PRINT
@@ -105,7 +106,27 @@ printi:
 	syscall
 printi_loop:
 	mov rax, rdi
-	div 10
-	push 
+	xor rdx, rdx
+	mov r9, 10
+	div r9
+	mov rdi, rax 
+	add rdx, 0x30
+	push rdx
+	inc r8
+	cmp rdi, 0
+	jne printi_loop
+printi_out:
+	mov rax, SYS_write
+	mov rdx, 1
+	mov rsi, printcPtr
+	mov rdi, STDOUT
+printi_out_loop:
+	pop r9
+	mov byte [printcPtr], r9b
+	syscall
+	dec r8
+	cmp r8, 0
+	jne printi_out_loop
+	ret
 
 %endif
