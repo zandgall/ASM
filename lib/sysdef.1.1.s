@@ -24,6 +24,7 @@ section .data
     SYS_exit equ 60
     SYS_creat equ 85
     SYS_time equ 201
+    SYS_getrandom equ 318
 
     PROT_NONE equ 0x0
     PROT_READ equ 0x1
