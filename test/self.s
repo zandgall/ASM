@@ -1,4 +1,4 @@
-%include "baseData.1.0.s"
+%include "../lib/baseData.1.0.s"
 
 section .data
 	input_max equ 32                ; Declare constant size, used to reserve variables
@@ -62,5 +62,5 @@ _start:                             ; Main code
 	mov rdi, 0
 	syscall
 
-%include "print.1.1.s"
-%include "input.1.0.s"
+%include "../lib/print.1.1.s"
+%include "../lib/input.1.0.s"

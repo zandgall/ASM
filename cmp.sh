@@ -6,13 +6,13 @@ then
 	exit 1
 elif [ $# -lt 2 ];
 then
-	eval "yasm -f elf -m amd64 $1 && ld ${1%.*}.o -o ${1%.*}"
+	eval "yasm -f elf -m amd64 -o ${1%.*}.o $1 && ld ${1%.*}.o -o ${1%.*}"
 	exit 0
 elif [[ $2 = "-d" ]];
 then
-	eval "yasm -f elf -m amd64 -g dwarf2 $1 && ld ${1%.*}.o -o ${1%.*}"
+	eval "yasm -f elf -m amd64 -g dwarf2 -o ${1%.*}.o $1 && ld ${1%.*}.o -o ${1%.*}"
 	exit 0
 else
-	eval "yasm -f elf -m amd64 $1 && ld ${1%.*}.o -o ${1%.*}"
+	eval "yasm -f elf -m amd64 -o ${1%.*}.o $1 && ld ${1%.*}.o -o ${1%.*}"
 	exit 0
 fi

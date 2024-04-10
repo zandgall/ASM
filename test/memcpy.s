@@ -1,7 +1,7 @@
-%include "baseData.1.0.s"
-%include "print.1.3.s"
-%include "input.1.1.s"
-%include "memcpy.1.0.s"
+%include "../lib/baseData.1.0.s"
+%include "../lib/print.1.3.s"
+%include "../lib/input.1.1.s"
+%include "../lib/memcpy.1.0.s"
 
 section .data
     content_len equ 16

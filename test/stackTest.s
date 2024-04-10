@@ -1,5 +1,5 @@
-%include "stdio.1.0.s"
-%include "stack.1.0.s"
+%include "../lib/stdio.1.0.s"
+%include "../lib/stack.1.0.s"
 
 section .data
 	input_len equ 16

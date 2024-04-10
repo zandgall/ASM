@@ -1,7 +1,7 @@
-%include "sysdef.1.1.s"
-%include "print.1.4.s"
-%include "input.1.2.s"
-%include "mem.1.0.s"
+%include "../lib/sysdef.1.1.s"
+%include "../lib/print.1.4.s"
+%include "../lib/input.1.2.s"
+%include "../lib/mem.1.0.s"
 
 section .data
 	success_msg db "Woo! It works :3",NL,NULL
